@@ -1,0 +1,11 @@
+Start Project
+ npm create vite@latest
+ cd client
+ npm install
+ npm run dev
+
+
+Vite + Tailwind
+step 2 , 3 , 4 , 5
+
+npm install react-router-dom
