@@ -9,7 +9,7 @@ const Footer = () => {
     <div className='bg-[#F6F9FC] text-gray-500/80 pt-8 px-6 md:px-16 lg:px-24 xl:px-32'>
             <div className='flex flex-wrap justify-between gap-12 md:gap-6'>
                 <div className='max-w-80'>
-                    <img src={assets.mylogo1new} alt="logo" className='mb-4 h-25 w-35' />
+                    <img src={assets.mylogo2new} alt="logo" className='mb-4 h-25 w-35 invert' />
                     <p className='text-sm'>
                         Discover the island's most extrodinary hotels, resorts, and vacation rentals. Experience the best of Quick Stay with our curated selection of accommodations that cater to every traveler's needs.
                     </p>
