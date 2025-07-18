@@ -9,3 +9,22 @@ Vite + Tailwind
 step 2 , 3 , 4 , 5
 
 npm install react-router-dom
+
+
+
+
+
+cd server 
+npm init -y
+npm i express dotenv cors mongoose cloudinary multer svix
+npm install --save-dev nodemon
+
+
+
+
+
+
+
+Database username - pasinduchandrasekara56
+password - OVzLyWKR6ckFLADF
+connection string - mongodb+srv://pasinduchandrasekara56:OVzLyWKR6ckFLADF@cluster0.qx22tpf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
