@@ -1,11 +1,12 @@
-import { use } from "react";
+
 import User from "../models/User.js";
 import { Webhook } from "svix";
 
 
 const clerkWebhooks = async (req,res)=>{
+    console.log("CLERK_WEBHOOK_SECRET:", process.env.CLERK_WEBHOOK_SECRET);
     try{
-        const whook = new Webhook(process.env.SVIX_SECRET);
+        const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
         const headers = {
             "svix-id": req.headers["svix-id"],
@@ -23,6 +24,7 @@ const clerkWebhooks = async (req,res)=>{
             email: data.email_addresses[0].email_address,
             username: data.first_name + " " + data.last_name,
             image: data.image_url,
+            recentSearchedCities: [],
         }
 
         switch (type) {
