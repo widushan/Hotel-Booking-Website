@@ -20,7 +20,7 @@ import { useAppContext } from './context/AppContext.jsx';
 const App = () => {
 
   const isOwnerPath = useLocation().pathname.includes('owner')
-  const {showHotelReg} = useAppContext
+  const {showHotelReg} = useAppContext()
 
   return (
 
