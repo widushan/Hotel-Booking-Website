@@ -36,7 +36,30 @@ export const AppProvider = ({ children }) => {
             }, 5000)
         }
     } catch (error) {
-        toast.error(error.message)
+        console.log("Fetch user error:", error.response?.data || error.message);
+        // If user doesn't exist, try to create them
+        if (error.response?.data?.message === "User not found" || error.response?.status === 400) {
+            try {
+                console.log("Attempting to create user...");
+                const createResponse = await axios.post('/api/user/create', {
+                    email: user.primaryEmailAddress.emailAddress,
+                    username: `${user.firstName} ${user.lastName}`,
+                    image: user.imageUrl
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${await getToken()}`
+                    }
+                });
+                console.log("User creation response:", createResponse.data);
+                // Retry fetching user after creation
+                fetchUser();
+            } catch (createError) {
+                console.error("User creation error:", createError.response?.data || createError.message);
+                toast.error(createError.response?.data?.message || createError.message);
+            }
+        } else {
+            toast.error(error.response?.data?.message || error.message);
+        }
     }
   }
 

@@ -5,6 +5,11 @@ import User from "../models/User.js";
 export const registerHotel = async (req, res) => {
   try {
     const { name, address, contact, city } = req.body;
+    
+    if (!req.user) {
+      return res.json({ success: false, message: "User not authenticated" });
+    }
+    
     const owner = req.user._id;
 
     // Check if User Already Registered
@@ -19,7 +24,8 @@ export const registerHotel = async (req, res) => {
     res.json({success: true, message: "Hotel Registered Successfully"})
 
   } catch (error) {
-    res.json({success: false, message: error.messagey})
+    console.error("Hotel registration error:", error);
+    res.json({success: false, message: error.message})
   }
 
 }
