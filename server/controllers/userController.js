@@ -33,7 +33,20 @@ export const getUserData = async (req, res) => {
 // Create user if doesn't exist
 export const createUser = async (req, res) => {
     try {
+        console.log("=== CREATE USER ENDPOINT CALLED ===");
+        console.log("Request body:", req.body);
+        console.log("Request auth:", req.auth());
+        
+        // Manual authentication check
         const { userId } = req.auth();
+        if (!userId) {
+            console.log("No userId found in auth");
+            return res.json({
+                success: false,
+                message: "Not authenticated"
+            });
+        }
+        
         const { email, username, image } = req.body;
         
         console.log("Creating user with ID:", userId);
@@ -41,12 +54,14 @@ export const createUser = async (req, res) => {
         
         // Check if user already exists
         let user = await User.findById(userId);
+        console.log("Existing user found:", user);
         
         if (!user) {
             console.log("User not found, creating new user...");
             // Create new user
             user = await User.create({
                 _id: userId,
+                clerkId: userId, // Use the same ID as clerkId
                 email,
                 username,
                 image,
@@ -63,7 +78,9 @@ export const createUser = async (req, res) => {
         });
         
     } catch (error) {
+        console.error("=== CREATE USER ERROR ===");
         console.error("Error creating user:", error);
+        console.error("Error stack:", error.stack);
         res.json({
             success: false,
             message: error.message
@@ -87,6 +104,7 @@ export const createUserManually = async (req, res) => {
             // Create new user
             user = await User.create({
                 _id: userId,
+                clerkId: userId, // Use the same ID as clerkId
                 email,
                 username,
                 image,
@@ -104,6 +122,37 @@ export const createUserManually = async (req, res) => {
         
     } catch (error) {
         console.error("Error creating user manually:", error);
+        res.json({
+            success: false,
+            message: error.message
+        });
+    }
+}
+
+// Fix existing users by adding clerkId
+export const fixExistingUsers = async (req, res) => {
+    try {
+        console.log("=== FIXING EXISTING USERS ===");
+        
+        // Find all users without clerkId
+        const users = await User.find({ clerkId: { $exists: false } });
+        console.log("Users without clerkId:", users);
+        
+        for (const user of users) {
+            console.log("Updating user:", user._id);
+            await User.findByIdAndUpdate(user._id, {
+                clerkId: user._id // Use _id as clerkId
+            });
+        }
+        
+        console.log("All users fixed successfully");
+        res.json({
+            success: true,
+            message: "Users fixed successfully"
+        });
+        
+    } catch (error) {
+        console.error("Error fixing users:", error);
         res.json({
             success: false,
             message: error.message

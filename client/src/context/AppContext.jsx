@@ -20,53 +20,79 @@ export const AppProvider = ({ children }) => {
   const [searchedCities, setSearchedCities] = useState([])
 
   const fetchUser = async () => {
+    console.log("=== FETCH USER STARTED ===");
+    console.log("User object:", user);
+    
     try {
+        console.log("Making API call to /api/user...");
         const { data } = await axios.get('/api/user', {
         headers: {
             Authorization: `Bearer ${await getToken()}`
         }
         });
+        console.log("API response:", data);
         if (data.success) {
         setIsOwner(data.role === "hotelOwner");
         setSearchedCities(data.recentSearchedCities)
+        console.log("User fetch successful, role:", data.role);
         } else {
-            //Retry fetching user details after 5 seconds
-            setTimeout(()=>{
-                fetchUser()
-            }, 5000)
+            console.log("User fetch failed with message:", data.message);
+            // Try to create user if user not found
+            if (data.message === "User not found") {
+                console.log("User not found, attempting to create user...");
+                try {
+                    console.log("=== ATTEMPTING USER CREATION ===");
+                    console.log("User data for creation:", {
+                        email: user.primaryEmailAddress.emailAddress,
+                        username: `${user.firstName} ${user.lastName}`,
+                        image: user.imageUrl
+                    });
+                    
+                    const createResponse = await axios.post('/api/user/create', {
+                        email: user.primaryEmailAddress.emailAddress,
+                        username: `${user.firstName} ${user.lastName}`,
+                        image: user.imageUrl
+                    }, {
+                        headers: {
+                            Authorization: `Bearer ${await getToken()}`
+                        }
+                    });
+                    console.log("User creation response:", createResponse.data);
+                    // Retry fetching user after creation
+                    setTimeout(() => {
+                        fetchUser();
+                    }, 1000);
+                } catch (createError) {
+                    console.error("=== USER CREATION ERROR ===");
+                    console.error("Create error details:", createError);
+                    console.error("Create error response:", createError.response?.data);
+                    toast.error("Failed to create user account. Please try again.");
+                }
+            } else {
+                // Retry fetching user details after 5 seconds for other errors
+                setTimeout(()=>{
+                    fetchUser()
+                }, 5000)
+            }
         }
     } catch (error) {
-        console.log("Fetch user error:", error.response?.data || error.message);
-        // If user doesn't exist, try to create them
-        if (error.response?.data?.message === "User not found" || error.response?.status === 400) {
-            try {
-                console.log("Attempting to create user...");
-                const createResponse = await axios.post('/api/user/create', {
-                    email: user.primaryEmailAddress.emailAddress,
-                    username: `${user.firstName} ${user.lastName}`,
-                    image: user.imageUrl
-                }, {
-                    headers: {
-                        Authorization: `Bearer ${await getToken()}`
-                    }
-                });
-                console.log("User creation response:", createResponse.data);
-                // Retry fetching user after creation
-                fetchUser();
-            } catch (createError) {
-                console.error("User creation error:", createError.response?.data || createError.message);
-                toast.error(createError.response?.data?.message || createError.message);
-            }
-        } else {
-            toast.error(error.response?.data?.message || error.message);
-        }
+        console.log("=== FETCH USER ERROR ===");
+        console.log("Error details:", error);
+        console.log("Error response:", error.response?.data);
+        console.log("Error message:", error.message);
+        toast.error("Failed to fetch user data. Please try again.");
     }
   }
 
 
   useEffect(() => {
+    console.log("=== USE EFFECT TRIGGERED ===");
+    console.log("User state:", user);
     if (user) {
+      console.log("User exists, calling fetchUser...");
       fetchUser();
+    } else {
+      console.log("No user found");
     }
   }, [user])
 
