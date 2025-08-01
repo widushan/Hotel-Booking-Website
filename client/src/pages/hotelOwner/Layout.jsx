@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Navbar from '../../components/hotelOwner/Navbar'
 import Sidebar from '../../components/hotelOwner/Sidebar'
 import { Outlet } from 'react-router-dom'
