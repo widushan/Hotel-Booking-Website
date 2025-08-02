@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { assets, facilityIcons, roomsDummyData} from '../assets/assets'
 import { useNavigate } from 'react-router-dom';
 import StarRating from '../components/StarRating';
@@ -19,6 +19,13 @@ export const AllRooms = () => {
     const [selectedSort, setSelectedSort] = useState('');
 
     const [openFilters, setOpenFilters] = useState(false)
+
+    // Effect to handle URL parameter changes
+    useEffect(() => {
+        const destination = searchParams.get('destination');
+        console.log('URL destination parameter changed:', destination);
+        console.log('Available rooms:', rooms.length);
+    }, [searchParams, rooms]);
 
     const CheckBox = ({label, selected=false, onChange =() => { }}) =>{
         return (
@@ -114,6 +121,10 @@ export const AllRooms = () => {
     
     // Filter and sort rooms based on the selected filters and sort option
     const filteredRooms = useMemo(() => {
+        const destination = searchParams.get('destination');
+        console.log('Filtering rooms with destination:', destination);
+        console.log('Available rooms:', rooms.length);
+        
         return rooms.filter(room =>
         matchesRoomType(room) &&
         matchesPriceRange(room) &&
@@ -132,7 +143,6 @@ export const AllRooms = () => {
     };
   
   
-      
 
   return (
 
