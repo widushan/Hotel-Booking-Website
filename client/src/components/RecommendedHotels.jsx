@@ -12,10 +12,16 @@ const RecommendedHotels = () => {
   const [recommended, setRecommended] = useState([]);
 
   const filterHotels = () => {
+    // Ensure searchedCities is an array and has items
+    if (!searchedCities || !Array.isArray(searchedCities) || searchedCities.length === 0) {
+      setRecommended([]);
+      return;
+    }
+    
     const filteredHotels = rooms.slice().filter(room =>
-        searchedCities && searchedCities.includes(room.hotel.city)
+        searchedCities.includes(room.hotel.city)
     );
-        setRecommended(filteredHotels);
+    setRecommended(filteredHotels);
    };
 
     useEffect(() => {

@@ -14,9 +14,9 @@ const Home = () => {
 
         < Hero />
 
-        < FeaturedDestination />
-
         < RecommendedHotels />
+
+        < FeaturedDestination />
 
         < ExclusiveOffers />
 

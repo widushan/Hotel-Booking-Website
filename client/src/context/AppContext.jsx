@@ -48,7 +48,7 @@ export const AppProvider = ({ children }) => {
         console.log("API response:", data);
         if (data.success) {
         setIsOwner(data.role === "hotelOwner");
-        setSearchedCities(data.recentSearchedCities)
+        setSearchedCities(data.recentSearchedCities || [])
         console.log("User fetch successful, role:", data.role);
         } else {
             console.log("User fetch failed with message:", data.message);
