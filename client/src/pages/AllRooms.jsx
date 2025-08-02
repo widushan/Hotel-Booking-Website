@@ -53,8 +53,8 @@ export const AllRooms = () => {
     ];
 
     const sortOptions = [
-        "Price: Low to High",
-        "Price: High to Low",
+        "Price Low to High",
+        "Price High to Low",
         "Newest First",
     ];
 
