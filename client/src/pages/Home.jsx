@@ -4,6 +4,7 @@ import FeaturedDestination from '../components/FeaturedDestination';
 import ExclusiveOffers from '../components/ExvlusiveOffers';
 import Testimonial from '../components/Testimonial';
 import NewsLetter from '../components/NewsLetter';
+import RecommendedHotels from '../components/RecommendedHotels';
 
 
 const Home = () => {
@@ -14,6 +15,8 @@ const Home = () => {
         < Hero />
 
         < FeaturedDestination />
+
+        < RecommendedHotels />
 
         < ExclusiveOffers />
 
