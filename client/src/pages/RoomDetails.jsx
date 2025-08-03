@@ -26,10 +26,10 @@ const RoomDetails = () => {
                 toast.error('Check-In date should be less than Check-Out date')
                 return;
             }
-            const {data} = await axios.post('/api/rooms/check-availability', {room: id, checkInDate, checkOutDate})
+            const {data} = await axios.post('/api/rooms/check-availability', {roomId: id, checkInDate, checkOutDate})
             
             if (data.success){
-                if (data.isAvailable){
+                if (data.available){
                     setIsAvailable(true)
                     toast.success('Room is Available')
                 } else {
@@ -38,6 +38,38 @@ const RoomDetails = () => {
                 }
             } else {
                 toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+
+    // onSubmitHandler function to check availability & book the room
+    const onSubmitHandler = async (e)=>{
+        try {
+            e.preventDefault();
+            if(!isAvailable) {
+                return checkAvailability();
+            } else {
+                const { data } = await axios.post('/api/bookings/book', {
+                    room: id,
+                    checkInDate,
+                    checkOutDate,
+                    guests,
+                    paymentMethod: "Pay At Hotel"
+                }, {
+                    headers: {
+                    Authorization: `Bearer ${await getToken()}`
+                    }
+                })
+                if (data.success) {
+                    toast.success(data.message)
+                    navigate('/my-bookings')
+                    scrollTo(0, 0)
+                } else {
+                    toast.error(data.message)
+                }
             }
         } catch (error) {
             toast.error(error.message)
@@ -105,7 +137,7 @@ const RoomDetails = () => {
         </div>
 
         {/* CheckIn CheckOut Form */}
-        <form className='flex flex-col md:flex-row items-start md:items-center justify-between bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.15)] p-6 rounded-xl mx-auto mt-16 max-w-6x1'>
+        <form onSubmit={onSubmitHandler} className='flex flex-col md:flex-row items-start md:items-center justify-between bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.15)] p-6 rounded-xl mx-auto mt-16 max-w-6x1'>
             <div className='flex flex-col flex-wrap md:flex-row items-start md:items-center gap-4 md:gap-10 text-gray-500'>
 
                 <div className='flex flex-col'>

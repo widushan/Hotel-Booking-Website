@@ -1,5 +1,6 @@
 import Hotel from "../models/Hotel.js";
 import Room from "../models/Room.js";
+import Booking from "../models/Booking.js";
 import {v2 as cloudinary} from "cloudinary";
 
 // API to create a new room for a hotel
@@ -81,4 +82,95 @@ export const toggleRoomAvailability = async (req, res) => {
     res.json({ success: false, message: error.message });
     }
 
+}
+
+// API to check room availability for given dates
+export const checkAvailability = async (req, res) => {
+    try {
+        const { roomId, checkInDate, checkOutDate } = req.body;
+
+        if (!roomId || !checkInDate || !checkOutDate) {
+            return res.json({ 
+                success: false, 
+                message: "Room ID, check-in date, and check-out date are required" 
+            });
+        }
+
+        // Check if the room exists and is available
+        const room = await Room.findById(roomId);
+        if (!room) {
+            return res.json({ 
+                success: false, 
+                message: "Room not found" 
+            });
+        }
+
+        if (!room.isAvailable) {
+            return res.json({ 
+                success: false, 
+                message: "Room is not available for booking" 
+            });
+        }
+
+        // Check for conflicting bookings
+        const conflictingBookings = await Booking.find({
+            room: roomId,
+            status: { $in: ["pending", "confirmed"] },
+            $or: [
+                // Check-in date falls within existing booking
+                {
+                    checkInDate: { $lte: new Date(checkInDate) },
+                    checkOutDate: { $gt: new Date(checkInDate) }
+                },
+                // Check-out date falls within existing booking
+                {
+                    checkInDate: { $lt: new Date(checkOutDate) },
+                    checkOutDate: { $gte: new Date(checkOutDate) }
+                },
+                // New booking completely encompasses existing booking
+                {
+                    checkInDate: { $gte: new Date(checkInDate) },
+                    checkOutDate: { $lte: new Date(checkOutDate) }
+                }
+            ]
+        });
+
+        if (conflictingBookings.length > 0) {
+            return res.json({ 
+                success: false, 
+                message: "Room is not available for the selected dates",
+                available: false
+            });
+        }
+
+        // Calculate number of nights
+        const checkIn = new Date(checkInDate);
+        const checkOut = new Date(checkOutDate);
+        const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+
+        // Calculate total price
+        const totalPrice = room.pricePerNight * nights;
+
+        res.json({ 
+            success: true, 
+            message: "Room is available for the selected dates",
+            available: true,
+            room: {
+                _id: room._id,
+                roomType: room.roomType,
+                pricePerNight: room.pricePerNight,
+                amenities: room.amenities,
+                images: room.images
+            },
+            bookingDetails: {
+                checkInDate: checkInDate,
+                checkOutDate: checkOutDate,
+                nights: nights,
+                totalPrice: totalPrice
+            }
+        });
+
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
 }
