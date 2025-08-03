@@ -26,25 +26,33 @@ const clerkWebhooks = async (req,res)=>{
         console.log("Webhook type:", type);
         console.log("User data:", data);
 
-        const userData = {
-            _id: data.id,
-            email: data.email_addresses[0].email_address,
-            username: data.first_name + " " + data.last_name,
-            image: data.image_url,
-            recentSearchedCities: [],
-        }
+        
         
         console.log("Processed user data:", userData);
 
         switch (type) {
             case "user.created":
+                const userData = {
+                    _id: data.id,
+                    email: data.email_addresses[0].email_address,
+                    username: data.first_name + " " + data.last_name,
+                    image: data.image_url,
+                    recentSearchedCities: [],
+                }
                 console.log("Creating user in database...");
                 const createdUser = await User.create(userData);
                 console.log("User created successfully:", createdUser);
                 break;
             case "user.updated":
+                const updatedUserData = {
+                    _id: data.id,
+                    email: data.email_addresses[0].email_address,
+                    username: data.first_name + " " + data.last_name,
+                    image: data.image_url,
+                    recentSearchedCities: [],
+                }
                 console.log("Updating user in database...");
-                const updatedUser = await User.findByIdAndUpdate(data.id, userData);
+                const updatedUser = await User.findByIdAndUpdate(data.id, updatedUserData);
                 console.log("User updated successfully:", updatedUser);
                 break;
             case "user.deleted":
