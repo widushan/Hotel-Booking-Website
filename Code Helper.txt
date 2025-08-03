@@ -35,4 +35,9 @@ connection string - mongodb+srv://pasinduchandrasekara56:OVzLyWKR6ckFLADF@cluste
 
 
 
-error in search hotels
+
+
+hootelbooking confirmation mail 
+nodemailer need to install in backend
+npm install nodemailer
+Brevo account
