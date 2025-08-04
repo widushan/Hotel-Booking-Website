@@ -7,7 +7,7 @@ import toast from 'react-hot-toast'
 
 const MyBookings = () => {
 
-  const {axios, getToken, user} = useAppContext()
+  const {axios, getToken, user, formatCurrency} = useAppContext()
 
   const [bookings, setBookings] = useState([])
 
@@ -28,6 +28,48 @@ const MyBookings = () => {
         toast.error(error.message)
     }
   }
+
+
+  const handlePayment = async (bookingId) => {
+    try {
+        console.log("=== PAYMENT REQUEST STARTED ===");
+        console.log("Booking ID:", bookingId);
+        
+        const { data } = await axios.post(
+        '/api/bookings/stripe-payment',
+        { bookingId },
+        {
+            headers: {
+            Authorization: `Bearer ${await getToken()}`
+            },
+            timeout: 15000 // 15 second timeout for payment processing
+        }
+        );
+
+        console.log("Payment response:", data);
+
+        if (data.success) {
+            console.log("✅ Payment session created, redirecting to Stripe...");
+            window.location.href = data.url;
+        } else {
+            console.error("❌ Payment failed:", data.message);
+            toast.error(data.message || "Payment failed. Please try again.");
+        }
+    } catch (error) {
+        console.error("❌ Payment error:", error);
+        
+        if (error.code === 'ECONNABORTED') {
+            toast.error("Payment request timed out. Please try again.");
+        } else if (error.response?.data?.message) {
+            toast.error(error.response.data.message);
+        } else if (error.message) {
+            toast.error(error.message);
+        } else {
+            toast.error("Payment processing failed. Please try again.");
+        }
+    }
+  };
+
 
   useEffect(() => {
     if (user){
@@ -68,7 +110,7 @@ const MyBookings = () => {
                                 <img src={assets.guestsIcon} alt="guests-icon" />
                                 <span>Guests: {booking.guests}</span>
                             </div>
-                            <p className='text-base'>Total: Rs.{booking.totalPrice}</p>
+                            <p className='text-base'>Total: {formatCurrency(booking.totalPrice)}</p>
                         </div>
                     </div>
 
@@ -94,7 +136,7 @@ const MyBookings = () => {
                         </div>
 
                         {!booking.isPaid && (
-                            <button className='px-4 py-1.5 mt-4 text-xs border border-grey-400 rounded-full hover:bg-gray-50 transition-all cursor-pointer'>Pay Now</button>
+                            <button onClick={() => handlePayment(booking._id)} className='px-4 py-1.5 mt-4 text-xs border border-grey-400 rounded-full hover:bg-gray-50 transition-all cursor-pointer'>Pay Now</button>
                         )}
 
                     </div>

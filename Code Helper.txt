@@ -49,3 +49,12 @@ Brevo account
 Deploy on vercel   -->
 client  -  https://hotel-booking-website-cyan-eta.vercel.app/
 server  -  https://hotel-booking-backend-five-vert.vercel.app/
+
+
+
+
+
+
+stripe payment
+npm install stripe
+bookingController file last func

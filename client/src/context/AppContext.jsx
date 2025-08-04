@@ -10,7 +10,7 @@ const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
 
-  const currency = import.meta.env.VITE_CURRENCY || "Rs";
+  const currency = import.meta.env.VITE_CURRENCY || "inr";
   const navigate = useNavigate();    
   const {user} = useUser();
   const {getToken} = useAuth();
@@ -20,16 +20,51 @@ export const AppProvider = ({ children }) => {
   const [searchedCities, setSearchedCities] = useState([])
   const [rooms, setRooms] = useState([])
 
+  // Currency formatting function
+  const formatCurrency = (amount) => {
+    const currencySymbols = {
+      'inr': '₹',
+      'usd': '$',
+      'eur': '€',
+      'gbp': '£',
+      'lkr': 'Rs.',
+      'sgd': 'S$'
+    };
+    
+    const symbol = currencySymbols[currency] || '₹';
+    const formattedAmount = new Intl.NumberFormat('en-IN', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    }).format(amount);
+    
+    return `${symbol}${formattedAmount}`;
+  };
+  
+
   const fetchRooms = async () => {
     try {
-      const { data } = await axios.get('/api/rooms')
+      console.log("=== FETCHING ROOMS ===");
+      const { data } = await axios.get('/api/rooms', {
+        timeout: 10000 // 10 second timeout
+      });
+      
       if (data.success) {
-        setRooms(data.rooms)
+        console.log(`✅ Successfully fetched ${data.rooms.length} rooms`);
+        setRooms(data.rooms);
       } else {
-        toast.error(data.message)
+        console.error("❌ Failed to fetch rooms:", data.message);
+        toast.error(data.message || "Failed to load rooms");
       }
     } catch (error) {
-      toast.error(error.message)
+      console.error("❌ Error fetching rooms:", error);
+      
+      if (error.code === 'ECONNABORTED') {
+        toast.error("Request timeout. Please check your connection and try again.");
+      } else if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Failed to load rooms. Please try again later.");
+      }
     }
   }
   
@@ -131,7 +166,8 @@ export const AppProvider = ({ children }) => {
     searchedCities,
     setSearchedCities,
     rooms,
-    setRooms
+    setRooms,
+    formatCurrency
   }
 
   return (

@@ -35,12 +35,12 @@ export const createUser = async (req, res) => {
     try {
         console.log("=== CREATE USER ENDPOINT CALLED ===");
         console.log("Request body:", req.body);
-        console.log("Request auth:", req.auth());
+        console.log("User ID from middleware:", req.userId);
         
-        // Manual authentication check
-        const { userId } = req.auth();
+        // Use userId from middleware
+        const userId = req.userId;
         if (!userId) {
-            console.log("No userId found in auth");
+            console.log("No userId found in middleware");
             return res.json({
                 success: false,
                 message: "Not authenticated"

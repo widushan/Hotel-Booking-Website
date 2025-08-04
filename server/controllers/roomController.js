@@ -2,6 +2,7 @@ import Hotel from "../models/Hotel.js";
 import Room from "../models/Room.js";
 import Booking from "../models/Booking.js";
 import {v2 as cloudinary} from "cloudinary";
+import mongoose from "mongoose";
 
 // API to create a new room for a hotel
 export const createRoom = async (req, res) => {
@@ -37,21 +38,48 @@ export const createRoom = async (req, res) => {
 // API to get all rooms
 export const getRooms = async (req, res) => {
     try {
+        console.log("=== GET ROOMS API CALLED ===");
+        
+        // Check database connection
+        if (mongoose.connection.readyState !== 1) {
+            console.error("❌ Database not connected. Ready state:", mongoose.connection.readyState);
+            return res.json({ 
+                success: false, 
+                message: "Database connection not available" 
+            });
+        }
+        
+        console.log("✅ Database connected, fetching rooms...");
+        
         const rooms = await Room.find({ isAvailable: true })
             .populate({
-            path: 'hotel',
-            populate: {
-                path: 'owner',
-                select: 'image'
-            }
+                path: 'hotel',
+                populate: {
+                    path: 'owner',
+                    select: 'image'
+                }
             })
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .maxTimeMS(5000); // Set 5 second timeout
 
+        console.log(`✅ Successfully fetched ${rooms.length} rooms`);
         res.json({ success: true, rooms });
+        
     } catch (error) {
-    res.json({ success: false, message: error.message });
+        console.error("❌ Error in getRooms:", error);
+        
+        if (error.name === 'MongooseError' && error.message.includes('buffering timed out')) {
+            return res.json({ 
+                success: false, 
+                message: "Database connection timeout. Please try again." 
+            });
+        }
+        
+        res.json({ 
+            success: false, 
+            message: error.message || "Failed to fetch rooms" 
+        });
     }
-
 }
 
 
