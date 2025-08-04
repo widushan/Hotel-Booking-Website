@@ -49,6 +49,7 @@ Brevo account
 Deploy on vercel   -->
 client  -  https://hotel-booking-website-cyan-eta.vercel.app/
 server  -  https://hotel-booking-backend-five-vert.vercel.app/
+https://hotel-booking-website-niy3.vercel.app/
 
 
 

@@ -14,7 +14,7 @@ import AddRoom from './pages/hotelOwner/AddRoom.jsx';
 import ListRoom from './pages/hotelOwner/ListRoom.jsx';
 import { Toaster } from 'react-hot-toast';
 import { useAppContext } from './context/AppContext.jsx';
-import Loader from './components/loader.jsx';
+import Loader from './components/Loader.jsx';
 
 
 
