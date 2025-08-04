@@ -9,6 +9,8 @@ import hotelRouter from './routes/hotelRoutes.js'
 import roomRouter from './routes/roomRoutes.js'
 import connectCloudinary from "./configs/cloudinary.js";
 import bookingRouter from "./routes/bookingRoutes.js";
+import { stripeWebhooks } from "./controllers/stripeWebhooks.js";
+
 
 // Check for required environment variables
 const requiredEnvVars = ['MONGODB_URI', 'CLERK_SECRET_KEY'];
@@ -34,6 +36,9 @@ app.use(cors({
     origin: process.env.CLIENT_URL || 'http://localhost:5173',
     credentials: true
 }));
+
+// API to listen to Stripe Webhooks
+app.post('/api/stripe', express.raw({type: 'application/json'}), stripeWebhooks);
 
 // Middleware for parsing JSON (except for webhooks)
 app.use((req, res, next) => {
