@@ -8,8 +8,9 @@ Create a `.env` file in the client directory with the following variables:
 # Backend API URL
 VITE_BACKEND_URL=http://localhost:3000
 
-# Currency
-VITE_CURRENCY=Rs
+# Currency Configuration
+VITE_CURRENCY=inr
+# Available options: inr, usd, eur, gbp, lkr, sgd
 
 # Clerk Configuration (if needed)
 VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key_here
@@ -33,4 +34,9 @@ VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key_here
 
 ### Authentication Issues
 - Make sure your Clerk publishable key is correct
-- Ensure the backend has the matching Clerk secret key 
+- Ensure the backend has the matching Clerk secret key
+
+### Currency Issues
+- Use valid currency codes: `inr`, `usd`, `eur`, `gbp`, `lkr`, `sgd`
+- Make sure the currency matches between client and server
+- The currency symbol will automatically update based on your configuration 
